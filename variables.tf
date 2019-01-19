@@ -2,6 +2,10 @@ variable "aws_key_name" {
   description = "SSH keypair name for the VPN instance"
 }
 
+variable "aws_region" {
+  default = "us-east-1"
+  }
+
 variable "vpc_id" {
   description = "Which VPC VPN server will be created in"
 }
