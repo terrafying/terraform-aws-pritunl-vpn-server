@@ -2,10 +2,8 @@
 
 yum update -y
 yum install -y python-pip
+pip install -U pip
 pip install awscli
-# upgrade pip to latest stable
-# pip install -U pip
-
 
 echo "* hard nofile 64000" >> /etc/security/limits.conf
 echo "* soft nofile 64000" >> /etc/security/limits.conf
