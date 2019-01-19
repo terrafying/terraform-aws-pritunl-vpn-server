@@ -6,12 +6,6 @@ yum update -y
 
 # upgrade pip to latest stable
 pip install -U pip
-# upgrade awscli to latest stable
-# upgrading pip from 9.0.3 to 10.0.1 changes the path from /usr/bin/pip to
-# /usr/local/bin/pip and the line below throws this error
-#     /var/lib/cloud/instance/scripts/part-001: line 10: /usr/bin/pip: No such file or directory
-# So, I export the PATH in the beggining correctly but still tries to from the old location
-# I couldn't see why in the outputs I'm going to hardcode it for now (01:10am)
 /usr/local/bin/pip install -U awscli
 
 echo "* hard nofile 64000" >> /etc/security/limits.conf
@@ -19,32 +13,31 @@ echo "* soft nofile 64000" >> /etc/security/limits.conf
 echo "root hard nofile 64000" >> /etc/security/limits.conf
 echo "root soft nofile 64000" >> /etc/security/limits.conf
 
-cat <<EOF > /etc/yum.repos.d/mongodb-org-3.2.repo
-[mongodb-org-3.2]
+sudo tee /etc/yum.repos.d/mongodb-org-4.0.repo << EOF
+[mongodb-org-4.0]
 name=MongoDB Repository
-baseurl=https://repo.mongodb.org/yum/amazon/2013.03/mongodb-org/3.2/x86_64/
+baseurl=https://repo.mongodb.org/yum/amazon/2/mongodb-org/4.0/x86_64/
 gpgcheck=1
 enabled=1
-gpgkey=https://www.mongodb.org/static/pgp/server-3.2.asc
+gpgkey=https://www.mongodb.org/static/pgp/server-4.0.asc
 EOF
 
-cat <<EOF > /etc/yum.repos.d/pritunl.repo
+sudo tee /etc/yum.repos.d/pritunl.repo << EOF
 [pritunl]
 name=Pritunl Repository
-baseurl=http://repo.pritunl.com/stable/yum/centos/7/
+baseurl=https://repo.pritunl.com/stable/yum/amazonlinux/2/
 gpgcheck=1
 enabled=1
 EOF
 
+sudo rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 7568D9BB55FF9E5287D586017AE645C0CF8E292A
 gpg --armor --export 7568D9BB55FF9E5287D586017AE645C0CF8E292A > key.tmp; sudo rpm --import key.tmp; rm -f key.tmp
+sudo yum -y install pritunl mongodb-org
+sudo systemctl start mongod pritunl
+sudo systemctl enable mongod pritunl
 
-yum install -y pritunl mongodb-org
-service mongod status || service mongod start
-
-chkconfig mongod on
-
-start pritunl || true
+#chkconfig mongod on
 
 cd /tmp
 curl https://amazon-ssm-eu-west-1.s3.amazonaws.com/latest/linux_amd64/amazon-ssm-agent.rpm -o amazon-ssm-agent.rpm
@@ -76,13 +69,7 @@ chmod 700 /usr/sbin/mongobackup.sh
 cat <<EOF > /etc/cron.daily/pritunl-backup
 #!/bin/bash -e
 export PATH="/usr/local/sbin:/usr/local/bin:\$PATH"
-mongobackup.sh && \
-  curl -fsS --retry 3 \
-  "https://hchk.io/\$( aws --region=${aws_region} --output=text \
-                        ssm get-parameters \
-                        --names ${healthchecks_io_key} \
-                        --with-decryption \
-                        --query 'Parameters[*].Value')"
+mongobackup.sh
 EOF
 chmod 755 /etc/cron.daily/pritunl-backup
 
