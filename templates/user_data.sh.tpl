@@ -33,12 +33,11 @@ gpg --armor --export 7568D9BB55FF9E5287D586017AE645C0CF8E292A > key.tmp; sudo rp
 sudo yum -y install pritunl mongodb-org
 sudo systemctl start mongod pritunl
 sudo systemctl enable mongod pritunl
-#chkconfig mongod on
 
 cd /tmp
 curl https://amazon-ssm-eu-west-1.s3.amazonaws.com/latest/linux_amd64/amazon-ssm-agent.rpm -o amazon-ssm-agent.rpm
 yum install -y amazon-ssm-agent.rpm
-status amazon-ssm-agent || start amazon-ssm-agent
+systemctl start amazon-ssm-agent
 
 cat <<EOF > /usr/sbin/mongobackup.sh
 #!/bin/bash -e
