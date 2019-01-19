@@ -1,12 +1,10 @@
 #!/bin/bash -xe
 
-export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin:/root/bin
-
 yum update -y
 
 # upgrade pip to latest stable
-pip install -U pip
-/usr/local/bin/pip install -U awscli
+# pip install -U pip
+python -m pip install awscli
 
 echo "* hard nofile 64000" >> /etc/security/limits.conf
 echo "* soft nofile 64000" >> /etc/security/limits.conf
