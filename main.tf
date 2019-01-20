@@ -280,7 +280,9 @@ resource "aws_instance" "pritunl" {
 
   subnet_id            = "${var.public_subnet_id}"
   iam_instance_profile = "${aws_iam_instance_profile.ec2_profile.name}"
-
+  lifecycle {
+    ignore_changes = ["user_data"]
+  }
   tags = "${
             merge(
               map("Name", format("%s-%s", var.resource_name_prefix, "vpn")),
