@@ -165,7 +165,7 @@ resource "aws_security_group" "pritunl" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["${var.internal_cidrs}"]
+    cidr_blocks = var.internal_cidrs
   }
 
   # HTTP access for Let's Encrypt validation
@@ -173,10 +173,7 @@ resource "aws_security_group" "pritunl" {
     from_port = 80
     to_port   = 80
     protocol  = "tcp"
-
-    cidr_blocks = [
-      "${var.whitelist_http}",
-    ]
+    cidr_blocks = var.whitelist_http
   }
 
   # HTTPS access
@@ -184,7 +181,7 @@ resource "aws_security_group" "pritunl" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["${var.internal_cidrs}"]
+    cidr_blocks = var.internal_cidrs
   }
 
   # VPN WAN access
@@ -200,7 +197,7 @@ resource "aws_security_group" "pritunl" {
     from_port   = -1
     to_port     = -1
     protocol    = "icmp"
-    cidr_blocks = ["${var.internal_cidrs}"]
+    cidr_blocks = var.internal_cidrs
   }
 
   # outbound internet access
