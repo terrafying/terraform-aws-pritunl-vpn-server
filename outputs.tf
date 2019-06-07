@@ -1,5 +1,9 @@
+locals {
+  private_ip = var.enabled ? aws_instance.pritunl[0].private_ip : ""
+}
+
 output "vpn_instance_private_ip_address" {
-  value = "${aws_instance.pritunl.*.private_ip}"
+  value = "${local.private_ip}"
 }
 
 output "vpn_public_ip_address" {
