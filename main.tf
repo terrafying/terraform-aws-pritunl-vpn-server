@@ -264,7 +264,12 @@ resource "aws_security_group" "allow_from_office" {
           }"
 }
 
+variable "enabled" {
+  default = true
+}
+
 resource "aws_instance" "pritunl" {
+  count = var.enabled ? 1 : 0
   ami           = "${var.ami_id}"
   instance_type = "${var.instance_type}"
   key_name      = "${var.aws_key_name}"
